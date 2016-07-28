@@ -4,9 +4,7 @@ import com.mongodb.Block;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.util.JSON;
 import org.bson.Document;
-import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
 
 import java.text.DateFormat;
