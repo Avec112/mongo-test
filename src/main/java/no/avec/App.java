@@ -1,8 +1,13 @@
 package no.avec;
 
+import com.mongodb.Block;
 import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.util.JSON;
 import org.bson.Document;
+import org.bson.json.JsonMode;
+import org.bson.json.JsonWriterSettings;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -23,8 +28,20 @@ public class App {
         app.connect();
 
         app.createDocument();
+        app.findDocument();
 
         app.close();
+    }
+
+    private void findDocument() {
+        FindIterable<Document> iterable = mongo.getCollection("restaurants").find();
+        iterable.forEach(new Block<Document>() {
+            @Override
+            public void apply(Document document) {
+                String json = document.toJson(new JsonWriterSettings(true));
+                System.out.println(json);
+            }
+        });
     }
 
     private void createDocument() {
