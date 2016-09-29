@@ -38,13 +38,16 @@ node {
     }
     stage('Deploy') {
         parallel(
-            "integration": {
+            "build image": {
 
             },
-            "performance": {
+            "deploy": {
 
             }
         )
+    }
+    stage('Verify deploy') {
+        echo 'verify deploy'
     }
 
     //stage('Results') {
