@@ -5,7 +5,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.bson.json.JsonWriterSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -18,36 +19,32 @@ import static java.util.Arrays.asList;
  * Created by avec on 29/07/16.
  */
 public class App {
+    public static final Logger LOG = LoggerFactory.getLogger(App.class);
+    public static final String RESTAURANTS = "restaurants";
+
     private MongoClient mongoClient;
-    private MongoDatabase mongo;
+    private MongoDatabase db;
 
-    public static void main(String[] args) {
-        App app = new App();
-        app.connect();
 
-        app.createDocument();
-        app.findDocument();
-
-        app.close();
+    void dropCollection() {
+        db.getCollection(RESTAURANTS).drop();
     }
 
-    private void findDocument() {
-        FindIterable<Document> iterable = mongo.getCollection("restaurants").find();
-        iterable.forEach(new Block<Document>() {
-            @Override
-            public void apply(Document document) {
-                String json = document.toJson(new JsonWriterSettings(true));
-                System.out.println(json);
-            }
-        });
+    /*
+        String json = document.toJson(new JsonWriterSettings(true));
+        System.out.println(json);
+    */
+    void findDocument() {
+        FindIterable<Document> iterable = db.getCollection(RESTAURANTS).find();
+        iterable.forEach((Block) document -> LOG.info(document.toString()));
     }
 
-    private void createDocument() {
-//        System.out.println("name: " + mongo.getName());
+    void createDocument() {
+        LOG.info("name: {}",db.getName());
 
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
         try {
-            mongo.getCollection("restaurants").insertOne(
+            db.getCollection(RESTAURANTS).insertOne(
                     new Document("address",
                             new Document()
                                     .append("street", "2 Avenue")
@@ -68,16 +65,16 @@ public class App {
                             .append("name", "Vella")
                             .append("restaurant_id", "41704620"));
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         }
     }
 
-    private void connect() {
-        mongoClient = new MongoClient("192.168.99.100");
-        mongo = mongoClient.getDatabase("test");
+    void connect(String host) {
+        mongoClient = new MongoClient(host);
+        db = mongoClient.getDatabase("test");
     }
 
-    private void close() {
+    void close() {
         mongoClient.close();
     }
 }
